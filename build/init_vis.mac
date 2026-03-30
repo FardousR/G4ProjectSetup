@@ -1,0 +1,34 @@
+# ======================================================================
+# Macro file for the initialization of LETrix in interactive (GUI) mode
+# ======================================================================
+
+# ----------------------------------------------------------------------
+# 1. Verbosity Settings
+# ----------------------------------------------------------------------
+# Set to 0 for a clean terminal, 1 for basic info, 2+ for debugging.
+# (Keeping tracking/event verbosity low is crucial so the GUI doesn't lag)
+/control/verbose 0
+/control/saveHistory
+/run/verbose 0
+/event/verbose 0
+/tracking/verbose 0
+
+# ----------------------------------------------------------------------
+# 2. Multithreading Configuration
+# ----------------------------------------------------------------------
+# Note: In LETrix, you handle threads using your C++ SimulationParameters
+# via the "-t" command-line flag. 
+# ONLY uncomment the line below if you explicitly want to override that.
+# /run/numberOfThreads 4
+
+# ----------------------------------------------------------------------
+# 3. Kernel Initialization
+# ----------------------------------------------------------------------
+# Builds the detector geometry, compiles the physics list, and readies the run
+/run/initialize
+
+# ----------------------------------------------------------------------
+# 4. Visualization Setup
+# ----------------------------------------------------------------------
+# Executes your specific visualization settings (camera angles, colors, etc.)
+/control/execute vis.mac
