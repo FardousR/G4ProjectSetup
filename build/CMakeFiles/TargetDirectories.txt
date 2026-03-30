@@ -1,3 +1,0 @@
-/home/fardous/Projects/G4ProjectSetup/build/CMakeFiles/LETrix.dir
-/home/fardous/Projects/G4ProjectSetup/build/CMakeFiles/edit_cache.dir
-/home/fardous/Projects/G4ProjectSetup/build/CMakeFiles/rebuild_cache.dir
