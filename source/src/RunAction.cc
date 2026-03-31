@@ -1,5 +1,6 @@
 #include "RunAction.hh"
 #include "PrimaryGeneratorAction.hh" 
+#include "Analysis.hh" // Make sure this is included!
 #include "G4RunManager.hh"
 #include "G4AccumulableManager.hh"
 #include "G4Run.hh"
@@ -20,8 +21,13 @@ RunAction::RunAction(SimulationParameters* simParams)
   : G4UserRunAction(),
     fSimParams(simParams),
     fTimer(new G4Timer()),
-    fProcessedEvents(0)
+    fProcessedEvents("ProcessedEvents", 0)
 {
+    // 1. MUST Link the parameters to the singleton BEFORE booking!
+    auto analysis = Analysis::GetAnalysis();
+    analysis->SetSimulationParameters(fSimParams); 
+    analysis->BookHistograms();
+
     G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
     accumulableManager->Register(fProcessedEvents);
 }
@@ -34,6 +40,10 @@ RunAction::~RunAction()
 void RunAction::BeginOfRunAction(const G4Run* run)
 {
     G4AccumulableManager::Instance()->Reset();
+
+    // 2. ALL threads (Master AND Workers) must open the analysis file
+    auto analysis = Analysis::GetAnalysis();
+    analysis->Open();
 
     if (IsMaster()) {
         PrimaryGeneratorAction::ResetGlobalCounters();
@@ -50,6 +60,12 @@ void RunAction::BeginOfRunAction(const G4Run* run)
 
 void RunAction::EndOfRunAction(const G4Run* run)
 {
+    // ALL threads (Master AND Workers) must save and close their data.
+    // Geant4 automatically merges the worker data into the master file here.
+    auto analysis = Analysis::GetAnalysis();
+    analysis->Save();
+    analysis->Close();
+
     G4AccumulableManager::Instance()->Merge();
 
     if (IsMaster()) {
@@ -63,8 +79,7 @@ void RunAction::EndOfRunAction(const G4Run* run)
         auto seconds = duration % 60;
         
         G4cout << "\n=============================================" << G4endl;
-        // G4cout << ">>> Run " << run->GetRunID() << " completed!" << G4endl;
-        G4cout << " Run completed!" << G4endl;
+        G4cout << " Run " << run->GetRunID() << " completed!" << G4endl;
         G4cout << " Total Events Simulated : " << fProcessedEvents.GetValue() << G4endl;
         G4cout << "=============================================" << G4endl;
         G4cout << std::left << std::setw(15) << " Days"    << ": " << days << G4endl;
@@ -78,7 +93,8 @@ void RunAction::EndOfRunAction(const G4Run* run)
 void RunAction::RecordEventProcessed()
 {
     fProcessedEvents += 1;
-    // Lock mutex before accessing the global counter
+    
+    // Lock mutex before accessing the global counter for console printing
     G4AutoLock lock(&progressMutex);
     fGlobalProcessedCounter++;
     UpdateProgress();

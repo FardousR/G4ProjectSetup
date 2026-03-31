@@ -2,7 +2,7 @@
 #include "PrimaryGeneratorAction.hh"
 #include "EventAction.hh" 
 #include "RunAction.hh"
-// #include "SteppingAction.hh" // Uncomment when you build this!
+#include "SteppingAction.hh" 
 
 ActionInitialization::ActionInitialization(SimulationParameters* simParams)
  : G4VUserActionInitialization(),
@@ -28,11 +28,11 @@ void ActionInitialization::Build() const
     auto runAction = new RunAction(fSimParams);
     SetUserAction(runAction);
 
-    // 3) EventAction (This hooks up the progress bar!)
+    // 3) EventAction (Handles the progress bar)
     auto eventAction = new EventAction(runAction);
     SetUserAction(eventAction);
 
-    // 3) SteppingAction (pass RunAction to it so it can call RecordEventProcessed!)
-    // auto steppingAction = new SteppingAction(runAction, fSimParams);
-    // SetUserAction(steppingAction);
+    // 4) SteppingAction (Now beautifully simple!)
+    auto steppingAction = new SteppingAction(fSimParams);
+    SetUserAction(steppingAction);
 }

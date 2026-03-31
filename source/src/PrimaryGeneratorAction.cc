@@ -28,7 +28,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(SimulationParameters* SimParams)
     // Set fixed geometry constants
     fSADx = 2560.0 * mm;
     fSADy = 2000.0 * mm;
-    fPosZ = 500.0 * mm;
+    fPosZ =  500.0 * mm;
 }
 
 PrimaryGeneratorAction::~PrimaryGeneratorAction()
@@ -87,6 +87,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
                          selectedSpot.div_y, -selectedSpot.cov_y, particlePosY, particleDirY);
 
     // Apply to Gun
+    // std::cout<<" Spot number: "<<selectedSpot.spot_num
+    //          <<"   Particle number: "<<selectedSpot.num_par - fLocalParticlesRemaining 
+    //          <<"   X :"<< selectedSpot.spotx 
+    //          <<"   Y :"<< selectedSpot.spoty <<"\n";
     fParticleGun->SetParticleEnergy(energy * MeV);
     fParticleGun->SetParticlePosition(G4ThreeVector(particlePosX, particlePosY, -fPosZ));
     fParticleGun->SetParticleMomentumDirection(G4ThreeVector(particleDirX, particleDirY, 1.0));

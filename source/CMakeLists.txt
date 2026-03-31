@@ -20,6 +20,9 @@ else()
     find_package(Geant4 REQUIRED)
 endif()
 
+# --- NEW: Find ROOT Package ---
+find_package(ROOT REQUIRED COMPONENTS Core Hist RIO)
+
 # ----------------------------------------------------------------------------
 # 3. Locate Sources and Headers
 # ----------------------------------------------------------------------------
@@ -33,11 +36,11 @@ file(GLOB headers CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/include/*.hh)
 # LETrix.cc is right next to CMakeLists.txt
 add_executable(LETrix LETrix.cc ${sources} ${headers})
 
-# Include headers from the local include folder
-target_include_directories(LETrix PRIVATE ${PROJECT_SOURCE_DIR}/include)
+# Include headers from the local include folder AND ROOT
+target_include_directories(LETrix PRIVATE ${PROJECT_SOURCE_DIR}/include ${ROOT_INCLUDE_DIRS})
 
-# Link against Geant4 libraries
-target_link_libraries(LETrix PUBLIC ${Geant4_LIBRARIES})
+# Link against Geant4 libraries AND ROOT
+target_link_libraries(LETrix PUBLIC ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 # ----------------------------------------------------------------------------
 # 5. Copy Macro Scripts to the Build Directory
